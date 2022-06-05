@@ -1,138 +1,19 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:sizer/sizer.dart';
 import 'package:twenty_forty_eight/Utils/Colors.dart';
 import '../Utils/tile.dart';
 
-// class GameScreen extends StatefulWidget {
-//   @override
-//   _GameScreenState createState() => _GameScreenState();
-// }
-//
-// class _GameScreenState extends State<GameScreen>
-//     with SingleTickerProviderStateMixin {
-//   late AnimationController _controller;
-//   List<List<Tile>> grid = List.generate(4, (y) => List.generate(4, (x) => Tile(x, y, 0)));
-//   Iterable<Tile> get flattenedGrid => grid.expand((e) => e);
-//   List<List<Tile>> get cols => List.generate(4, (x) => List.generate(4, (y) => grid[y][x]));
-//
-//   @override
-//   void initState(){
-//     super.initState();
-//
-//     _controller = AnimationController(vsync: this, duration: Duration());
-//     grid[1][2].value = 4;
-//
-//     flattenedGrid.forEach((element) => element.resetAnimations());
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//
-//     double gridSize = MediaQuery.of(context).size.width - 16.0 * 2;
-//     double tileSize = (gridSize - 4.0 * 2) / 4;
-//     List<Widget> stackItems = [];
-//     stackItems.addAll(flattenedGrid.map((e) => Positioned(
-//       left: e.x * tileSize,
-//       top: e.y * tileSize,
-//       width: tileSize,
-//       height: tileSize,
-//       child: Center(
-//         child: Container(
-//           width: tileSize - 4.0 * 2,
-//           height: tileSize - 4.0 * 2,
-//           decoration: BoxDecoration(borderRadius: BorderRadius.circular(8.0), color: lightBrown),
-//         ),
-//       ),
-//     )));
-//     stackItems.addAll(flattenedGrid.map((e) => AnimatedBuilder(
-//         animation: _controller,
-//         builder: (context, child) => e.animatedValue.value == 0 ? SizedBox() : Positioned(
-//           left: e.x * tileSize,
-//           top: e.y * tileSize,
-//           width: tileSize,
-//           height: tileSize,
-//           child: Center(
-//             child: Container(
-//               width: tileSize - 4.0 * 2,
-//               height: tileSize - 4.0 * 2,
-//               decoration: BoxDecoration(borderRadius: BorderRadius.circular(8.0), color: numTileColor[e.animatedValue.value]),
-//               child: Center(
-//                 child: Text(e.animatedValue.value.toString(),
-//                 style: TextStyle(fontSize: 32.0.sp, fontWeight: FontWeight.w600, color: numTextColor[e.animatedValue.value]),),
-//               ),
-//             ),
-//           ),
-//         )
-//     )));
-//
-//     return Scaffold(
-//       backgroundColor: tan,
-//       body: Center(
-//         child: Container(
-//           width: gridSize,
-//           height: gridSize,
-//           padding: EdgeInsets.all(4.0),
-//           decoration: BoxDecoration(
-//             borderRadius: BorderRadius.circular(8.0), color: darkBrown
-//           ),
-//           child: GestureDetector(
-//             onVerticalDragEnd: (details) {
-//               if (details.velocity.pixelsPerSecond.dy < -250 && canSwipeUp()) {
-//                 // up();
-//               } else if (details.velocity.pixelsPerSecond.dy > 250 && canSwipeDown()) {
-//                 // down();
-//               }
-//             },
-//             onHorizontalDragEnd: (details) {
-//               if (details.velocity.pixelsPerSecond.dx < -1000 && canSwipeLeft()) {
-//                 // left();
-//               } else if (details.velocity.pixelsPerSecond.dx > 1000 && canSwipeDown()) {
-//                 // right();
-//               }
-//             },
-//             child: Stack(
-//               children: stackItems,
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-//
-//   bool canSwipeLeft() => grid.any(canSwipe);
-//   bool canSwipeRight() => grid.map((e) => e.reversed.toList()).any(canSwipe);
-//   bool canSwipeUp() => cols.any(canSwipe);
-//   bool canSwipeDown() => cols.map((e) => e.reversed.toList()).any(canSwipe);
-//
-//   bool canSwipe(List<Tile> tiles){
-//     for(int i = 0; i<tiles.length; i++){
-//       if(tiles[i].value == 0){
-//         if(tiles.skip(i+1).any((element) => element.value != 0)){ return true; }
-//       }
-//       else{
-//         Tile nextNonZero = tiles.skip(i+1).firstWhere((element) => element.value != 0, orElse: () => Tile(0,0,0));
-//         if(nextNonZero != Tile(0,0,0) && nextNonZero.value == tiles[i].value){
-//           return true;
-//         }
-//       }
-//     }
-//     return false;
-//   }
-//
-// }
-
 enum SwipeDirection { up, down, left, right }
 
 class GameState {
-  // this is the grid before the swipe has taken place
   final List<List<Tile>> _previousGrid;
   final SwipeDirection swipe;
 
   GameState(List<List<Tile>> previousGrid, this.swipe) : _previousGrid = previousGrid;
 
-  // always make a copy so mutations don't screw things up.
   List<List> get previousGrid => _previousGrid.map((row) => row.map((tile) => tile.copy()).toList()).toList();
 }
 
@@ -174,9 +55,9 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    double contentPadding = 16;
-    double borderSize = 4;
-    double gridSize = MediaQuery.of(context).size.width - contentPadding * 2;
+    double contentPadding = 16.0.sp;
+    double borderSize = 4.0.sp;
+    double gridSize = 100.w - contentPadding * 2;
     double tileSize = (gridSize - borderSize * 2) / 4;
     List<Widget> stackItems = [];
     stackItems.addAll(gridTiles.map((t) => TileWidget(
@@ -198,6 +79,42 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
             child: Center(child: TileNumber(tile.animatedValue.value))))));
 
     return Scaffold(
+        appBar: NeumorphicAppBar(
+          centerTitle: true,
+          title: NeumorphicText(
+            '2048',
+            textStyle: NeumorphicTextStyle(fontSize: 24.0.sp),
+            style: NeumorphicStyle(color: orange),
+          ),
+          leading: GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Neumorphic(
+              style: NeumorphicStyle(color: orange),
+              child: Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle
+                ),
+                child: NeumorphicIcon(Icons.arrow_back_ios_new_outlined, size: 22.0.sp,),
+              ),
+            ),
+          ),
+          actions: [
+            GestureDetector(
+              onTap: gameStates.isEmpty ? () => print('Hi') : undoMove,
+              child: Neumorphic(
+                style: NeumorphicStyle(color: orange),
+                child: Container(
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle
+                  ),
+                  child: NeumorphicIcon(Icons.undo_outlined, size: 22.0.sp,),
+                ),
+              ),
+            )
+          ],
+        ),
         backgroundColor: tan,
         body: Padding(
             padding: EdgeInsets.all(contentPadding),
@@ -207,16 +124,34 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                   down: () => merge(SwipeDirection.down),
                   left: () => merge(SwipeDirection.left),
                   right: () => merge(SwipeDirection.right),
-                  child: Container(
-                      height: gridSize,
-                      width: gridSize,
-                      padding: EdgeInsets.all(borderSize),
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(cornerRadius), color: darkBrown),
-                      child: Stack(
-                        children: stackItems,
-                      ))),
-              BigButton(label: "Undo", color: numColor, onPressed: gameStates.isEmpty ? () => print('Hi') : undoMove),
-              BigButton(label: "Restart", color: orange, onPressed: setupNewGame),
+                  child: Neumorphic(
+                    style: NeumorphicStyle(
+                        shape: NeumorphicShape.concave,
+                        boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
+                        depth: 8,
+                        lightSource: LightSource.topLeft,
+                        color: Colors.grey
+                    ),
+                    child: Container(
+                        height: gridSize,
+                        width: gridSize,
+                        padding: EdgeInsets.all(borderSize),
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(cornerRadius), color: darkBrown),
+                        child: Stack(
+                          children: stackItems,
+                        )),
+                  )),
+              Container(
+                  height: 8.h,
+                  width: 80.w,
+                  child: NeumorphicButton(
+                    style: NeumorphicStyle(
+                      color: orange,
+                      boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(cornerRadius)),
+                    ),
+                    child: Text('Restart', style: TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w700), textAlign: TextAlign.center,),
+                    onPressed: setupNewGame,
+                  ))
             ])));
   }
 

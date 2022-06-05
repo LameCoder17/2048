@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:sizer/sizer.dart';
 import 'Colors.dart';
 
 // class Tile {
@@ -91,15 +93,24 @@ class TileWidget extends StatelessWidget {
   Widget build(BuildContext context) => Positioned(
       left: x,
       top: y,
-      child: Container(
-          width: containerSize,
-          height: containerSize,
-          child: Center(
-              child: Container(
-                  width: size,
-                  height: size,
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(cornerRadius), color: color),
-                  child: child))));
+      child: Neumorphic(
+        style: NeumorphicStyle(
+            shape: NeumorphicShape.concave,
+            boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
+            depth: 8,
+            lightSource: LightSource.topLeft,
+            color: Colors.grey
+        ),
+        child: Container(
+            width: containerSize,
+            height: containerSize,
+            child: Center(
+                child: Container(
+                    width: size,
+                    height: size,
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(cornerRadius), color: color),
+                    child: child))),
+      ));
 }
 
 class TileNumber extends StatelessWidget {
@@ -108,30 +119,32 @@ class TileNumber extends StatelessWidget {
   const TileNumber(this.val, {Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => Text("$val",
-      style: TextStyle(color: numTextColor[val], fontSize: val > 512 ? 28 : 35, fontWeight: FontWeight.w900));
+  Widget build(BuildContext context) => NeumorphicText("$val",
+      textStyle: NeumorphicTextStyle(fontSize: val > 512 ? 28.0.sp : 35.0.sp, fontWeight: FontWeight.w900),
+      style: NeumorphicStyle(color: numTextColor[val]),
+  );
 }
 
-class BigButton extends StatelessWidget {
-  final String label;
-  final Color color;
-  final void Function() onPressed;
-
-  const BigButton({Key? key, required this.label, required this.color, required this.onPressed}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) => Container(
-      height: 80,
-      width: 400,
-      child: RaisedButton(
-        color: color,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(cornerRadius),
-        ),
-        child: Text(label, style: TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w700)),
-        onPressed: onPressed,
-      ));
-}
+// class BigButton extends StatelessWidget {
+//   final String label;
+//   final Color color;
+//   final void Function() onPressed;
+//
+//   const BigButton({Key? key, required this.label, required this.color, required this.onPressed}) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) => Container(
+//       height: 80,
+//       width: 400,
+//       child: RaisedButton(
+//         color: color,
+//         shape: RoundedRectangleBorder(
+//           borderRadius: BorderRadius.circular(cornerRadius),
+//         ),
+//         child: Text(label, style: TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w700)),
+//         onPressed: onPressed,
+//       ));
+// }
 
 class Swiper extends StatelessWidget {
   final Function() up;
