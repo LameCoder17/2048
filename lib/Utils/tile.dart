@@ -4,28 +4,9 @@ import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:sizer/sizer.dart';
 import 'Colors.dart';
 
-// class Tile {
-//   final int x;
-//   final int y;
-//
-//   int value;
-//
-//   late Animation<double> animatedX;
-//   late Animation<double> animatedY;
-//   late Animation<double> size;
-//   late Animation<int> animatedValue;
-//
-//   Tile(this.x, this.y, this.value) {
-//     resetAnimations();
-//   }
-//
-//   void resetAnimations() {
-//     animatedX = AlwaysStoppedAnimation(x.toDouble());
-//     animatedY = AlwaysStoppedAnimation(y.toDouble());
-//     size = AlwaysStoppedAnimation(1.0);
-//     animatedValue = AlwaysStoppedAnimation(value);
-//   }
-// }
+List<int> gameScore = [];
+int newScore= 0;
+
 class Tile {
   final int x;
   final int y;
@@ -95,10 +76,10 @@ class TileWidget extends StatelessWidget {
       top: y,
       child: Neumorphic(
         style: NeumorphicStyle(
-            shape: NeumorphicShape.concave,
+            shape: NeumorphicShape.convex,
             boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
             depth: 8,
-            lightSource: LightSource.topLeft,
+            lightSource: LightSource.top,
             color: Colors.grey
         ),
         child: Container(
@@ -124,27 +105,6 @@ class TileNumber extends StatelessWidget {
       style: NeumorphicStyle(color: numTextColor[val]),
   );
 }
-
-// class BigButton extends StatelessWidget {
-//   final String label;
-//   final Color color;
-//   final void Function() onPressed;
-//
-//   const BigButton({Key? key, required this.label, required this.color, required this.onPressed}) : super(key: key);
-//
-//   @override
-//   Widget build(BuildContext context) => Container(
-//       height: 80,
-//       width: 400,
-//       child: RaisedButton(
-//         color: color,
-//         shape: RoundedRectangleBorder(
-//           borderRadius: BorderRadius.circular(cornerRadius),
-//         ),
-//         child: Text(label, style: TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w700)),
-//         onPressed: onPressed,
-//       ));
-// }
 
 class Swiper extends StatelessWidget {
   final Function() up;

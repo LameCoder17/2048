@@ -76,13 +76,13 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
             containerSize: tileSize,
             size: (tileSize - borderSize * 2) * tile.size.value,
             color: numTileColor[tile.animatedValue.value]!,
-            child: Center(child: TileNumber(tile.animatedValue.value))))));
+            child: Center(child: FittedBox(child: TileNumber(tile.animatedValue.value)))))));
 
     return Scaffold(
         appBar: NeumorphicAppBar(
           centerTitle: true,
           title: NeumorphicText(
-            '2048',
+            gameScore.last.toString(),
             textStyle: NeumorphicTextStyle(fontSize: 24.0.sp),
             style: NeumorphicStyle(color: orange),
           ),
@@ -101,7 +101,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
           ),
           actions: [
             GestureDetector(
-              onTap: gameStates.isEmpty ? () => print('Hi') : undoMove,
+              onTap: setupNewGame,
               child: Neumorphic(
                 style: NeumorphicStyle(color: orange),
                 child: Container(
@@ -109,55 +109,62 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                   decoration: BoxDecoration(
                     shape: BoxShape.circle
                   ),
-                  child: NeumorphicIcon(Icons.undo_outlined, size: 22.0.sp,),
+                  child: NeumorphicIcon(Icons.restart_alt_outlined, size: 22.0.sp,),
                 ),
               ),
             )
           ],
         ),
+        floatingActionButton: GestureDetector(
+          onTap: gameStates.isEmpty ? () => setupNewGame : undoMove,
+          child: Neumorphic(
+            style: NeumorphicStyle(color: orange),
+            child: Container(
+              height: 7.h,
+              width: 7.h,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle
+              ),
+              child: NeumorphicIcon(Icons.undo_outlined, size: 22.0.sp,),
+            ),
+          ),
+        ),
         backgroundColor: tan,
-        body: Padding(
+        body: Container(
             padding: EdgeInsets.all(contentPadding),
-            child: Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-              Swiper(
-                  up: () => merge(SwipeDirection.up),
-                  down: () => merge(SwipeDirection.down),
-                  left: () => merge(SwipeDirection.left),
-                  right: () => merge(SwipeDirection.right),
-                  child: Neumorphic(
-                    style: NeumorphicStyle(
-                        shape: NeumorphicShape.concave,
-                        boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
-                        depth: 8,
-                        lightSource: LightSource.topLeft,
-                        color: Colors.grey
-                    ),
-                    child: Container(
-                        height: gridSize,
-                        width: gridSize,
-                        padding: EdgeInsets.all(borderSize),
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(cornerRadius), color: darkBrown),
-                        child: Stack(
-                          children: stackItems,
-                        )),
-                  )),
-              Container(
-                  height: 8.h,
-                  width: 80.w,
-                  child: NeumorphicButton(
-                    style: NeumorphicStyle(
-                      color: orange,
-                      boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(cornerRadius)),
-                    ),
-                    child: Text('Restart', style: TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w700), textAlign: TextAlign.center,),
-                    onPressed: setupNewGame,
-                  ))
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Swiper(
+                      up: () => merge(SwipeDirection.up),
+                      down: () => merge(SwipeDirection.down),
+                      left: () => merge(SwipeDirection.left),
+                      right: () => merge(SwipeDirection.right),
+                      child: Neumorphic(
+                        style: NeumorphicStyle(
+                            shape: NeumorphicShape.convex,
+                            boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
+                            depth: 8,
+                            lightSource: LightSource.topLeft,
+                            color: Colors.grey
+                        ),
+                        child: Container(
+                            height: gridSize,
+                            width: gridSize,
+                            padding: EdgeInsets.all(borderSize),
+                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(cornerRadius), color: darkBrown),
+                            child: Stack(
+                              children: stackItems,
+                            )),
+                      )),
             ])));
   }
 
   void undoMove() {
     GameState previousState = gameStates.removeLast();
-    bool Function() mergeFn;
+    gameScore.removeLast();
+    bool Function({bool undo}) mergeFn;
     switch (previousState.swipe) {
       case SwipeDirection.up:
         mergeFn = mergeUp;
@@ -174,7 +181,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     }
     setState(() {
       this.grid = previousState.previousGrid as List<List<Tile>>;
-      mergeFn();
+      mergeFn(undo: true);
       controller.reverse(from: .99).then((_) {
         setState(() {
           this.grid = previousState.previousGrid as List<List<Tile>>;
@@ -205,20 +212,21 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
       if (mergeFn()) {
         gameStates.add(GameState(gridBeforeSwipe, direction));
         addNewTiles([2]);
+        gameScore.add(newScore);
         controller.forward(from: 0);
       }
     });
   }
 
-  bool mergeLeft() => grid.map((e) => mergeTiles(e)).toList().any((e) => e);
+  bool mergeLeft({bool undo = false}) => grid.map((e) => mergeTiles(e, undo: undo)).toList().any((e) => e);
 
-  bool mergeRight() => grid.map((e) => mergeTiles(e.reversed.toList())).toList().any((e) => e);
+  bool mergeRight({bool undo = false}) => grid.map((e) => mergeTiles(e.reversed.toList(), undo: undo)).toList().any((e) => e);
 
-  bool mergeUp() => gridCols.map((e) => mergeTiles(e)).toList().any((e) => e);
+  bool mergeUp({bool undo = false}) => gridCols.map((e) => mergeTiles(e, undo: undo)).toList().any((e) => e);
 
-  bool mergeDown() => gridCols.map((e) => mergeTiles(e.reversed.toList())).toList().any((e) => e);
+  bool mergeDown({bool undo = false}) => gridCols.map((e) => mergeTiles(e.reversed.toList(), undo: undo)).toList().any((e) => e);
 
-  bool mergeTiles(List<Tile> tiles) {
+  bool mergeTiles(List<Tile> tiles, {bool undo = false}) {
     bool didChange = false;
     for (int i = 0; i < tiles.length; i++) {
       for (int j = i; j < tiles.length; j++) {
@@ -236,6 +244,9 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
               mergeTile.moveTo(controller, tiles[i].x, tiles[i].y);
               mergeTile.bounce(controller);
               mergeTile.changeNumber(controller, resultValue);
+              if(mergeTile.value != 0 && !undo){
+                newScore = gameScore.last + resultValue;
+              }
               mergeTile.value = 0;
               tiles[j].changeNumber(controller, 0);
             }
@@ -267,6 +278,8 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
       toAdd.clear();
       addNewTiles([2, 2]);
       controller.forward(from: 0);
+      gameScore.clear();
+      gameScore.add(0);
     });
   }
 }

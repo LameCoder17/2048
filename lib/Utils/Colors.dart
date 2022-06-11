@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
-const double cornerRadius = 8.0;
-const double moveInterval = .5;
+double cornerRadius = 8.0.sp;
+const double moveInterval = 0.5;
 
 const Color lightBrown = Color.fromARGB(255, 205, 193, 180);
 const Color darkBrown = Color.fromARGB(255, 187, 173, 160);
